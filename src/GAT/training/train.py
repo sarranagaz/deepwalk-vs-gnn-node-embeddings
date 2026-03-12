@@ -1,4 +1,4 @@
-"""Training script for the GAT model on the Cora dataset using PyTorch Lightning."""
+"""Training script for the GAT model using PyTorch Lightning."""
 
 from pathlib import Path
 
@@ -70,4 +70,4 @@ def main(data: str = "Cora") -> None:
 
 
 if __name__ == "__main__":
-    main(data="PubMed")
+    main(data="Cora")

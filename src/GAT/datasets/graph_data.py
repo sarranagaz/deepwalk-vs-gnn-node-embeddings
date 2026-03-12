@@ -299,7 +299,7 @@ def plot_degree_distribution(edge_index: torch.Tensor, num_nodes: int, save_path
 
 
 if __name__ == "__main__":
-    graph_data = load_pubmed_data(root="data", self_loops=True)
+    graph_data = load_cora_data(root="data", self_loops=True)
     describe_graph(graph_data)
 
     train_loader, val_loader, test_loader = build_split_loaders(graph_data, batch_size=64)
@@ -308,5 +308,5 @@ if __name__ == "__main__":
     print("First train batch shape:", first_batch.shape)
     print("First train batch:", first_batch[:10])
 
-    plot_class_distribution(graph_data.y, "outputs/pubmed_class_distribution.png")
-    plot_degree_distribution(graph_data.edge_index, graph_data.num_nodes, "outputs/pubmed_degree_distribution.png")
+    plot_class_distribution(graph_data.y, "outputs/cora_class_distribution.png")
+    plot_degree_distribution(graph_data.edge_index, graph_data.num_nodes, "outputs/cora_degree_distribution.png")
