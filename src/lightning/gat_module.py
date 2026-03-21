@@ -3,8 +3,7 @@
 import lightning.pytorch as pl
 import torch
 import torch.nn.functional as F
-
-from src.GAT.models.gat import GAT
+from src.models.gat import GAT
 
 
 class LitGAT(pl.LightningModule):  # type: ignore

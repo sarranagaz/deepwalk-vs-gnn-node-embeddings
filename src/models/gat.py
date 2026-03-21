@@ -3,9 +3,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from src.datasets.graph_data import load_data
 from torch_geometric.utils import softmax
-
-from src.GAT.datasets.graph_data import load_cora_data
 
 
 class GATLayer(nn.Module):  # type: ignore
@@ -207,7 +206,7 @@ class GAT(nn.Module):  # type: ignore
 
 
 if __name__ == "__main__":
-    data = load_cora_data()
+    data = load_data(name="Cora", root="data", self_loops=True)
 
     model = GAT(
         nfeat=data.num_features,

@@ -1,5 +1,6 @@
 """Data loading and preprocessing for graph datasets."""
 
+import argparse
 from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
@@ -37,55 +38,23 @@ class GraphData:
         )
 
 
-# Cora dataset:
-def load_cora_data(root: str = "data", self_loops: bool = True) -> GraphData:
-    """Loads the Cora dataset and returns it as a GraphData object.
+def load_data(name: str, root: str = "data", self_loops: bool = True) -> GraphData:
+    """Loads the specified dataset and returns it as a GraphData object.
 
     Args:
+        name: The name of the dataset to load. Supported values are "Cora", "Citeseer", and "PubMed".
         root: The root directory where the dataset will be saved.
         self_loops: Whether to add self-loops to the edge index.
 
     Returns:
-        GraphData: A GraphData object containing the Cora dataset.
+        GraphData: A GraphData object containing the specified dataset.
+
+    Raises:
+        ValueError: If an unsupported dataset name is provided.
     """
-    dataset = Planetoid(root=root, name="Cora")
-    data = dataset[0]
-
-    x = data.x.float()
-    y = data.y.long()
-    edge_index = data.edge_index.long()
-    if self_loops:
-        edge_index = add_self_loops(edge_index, num_nodes=x.shape[0])
-    train_mask = data.train_mask.bool()
-    val_mask = data.val_mask.bool()
-    test_mask = data.test_mask.bool()
-
-    graph_data = GraphData(
-        x=x,
-        y=y,
-        edge_index=edge_index,
-        train_mask=train_mask,
-        val_mask=val_mask,
-        test_mask=test_mask,
-        num_nodes=x.shape[0],
-        num_features=x.shape[1],
-        num_classes=dataset.num_classes,
-    )
-
-    return graph_data
-
-
-def load_pubmed_data(root: str = "data", self_loops: bool = True) -> GraphData:
-    """Loads the PubMed dataset and returns it as a GraphData object.
-
-    Args:
-        root: The root directory where the dataset will be saved.
-        self_loops: Whether to add self-loops to the edge index.
-
-    Returns:
-        GraphData: A GraphData object containing the PubMed dataset.
-    """
-    dataset = Planetoid(root=root, name="PubMed")
+    if name not in {"Cora", "Citeseer", "PubMed"}:
+        raise ValueError(f"Unsupported dataset name: {name}. Supported values are 'Cora', 'Citeseer', and 'PubMed'.")
+    dataset = Planetoid(root=root, name=name)
     data = dataset[0]
 
     x = data.x.float()
@@ -299,7 +268,23 @@ def plot_degree_distribution(edge_index: torch.Tensor, num_nodes: int, save_path
 
 
 if __name__ == "__main__":
-    graph_data = load_cora_data(root="data", self_loops=True)
+    parser = argparse.ArgumentParser(description="Graph data loading and analysis")
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="Cora",
+        choices=["Cora", "Citeseer", "PubMed"],
+        help="The name of the dataset to load",
+    )
+    parser.add_argument(
+        "--self-loops",
+        action="store_true",
+        default=True,
+        help="Whether to add self-loops to the edge index",
+    )
+    args = parser.parse_args()
+    graph_data = load_data(name=args.dataset, self_loops=args.self_loops)
+
     describe_graph(graph_data)
 
     train_loader, val_loader, test_loader = build_split_loaders(graph_data, batch_size=64)
@@ -308,5 +293,9 @@ if __name__ == "__main__":
     print("First train batch shape:", first_batch.shape)
     print("First train batch:", first_batch[:10])
 
-    plot_class_distribution(graph_data.y, "outputs/cora_class_distribution.png")
-    plot_degree_distribution(graph_data.edge_index, graph_data.num_nodes, "outputs/cora_degree_distribution.png")
+    plot_class_distribution(graph_data.y, f"outputs/{args.dataset}_class_distribution.png")
+    plot_degree_distribution(
+        graph_data.edge_index,
+        graph_data.num_nodes,
+        f"outputs/{args.dataset}_degree_distribution.png",
+    )
