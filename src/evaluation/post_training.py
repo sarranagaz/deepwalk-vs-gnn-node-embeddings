@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import torch
 from sklearn.manifold import TSNE
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
-
 from src.GAT.lightning.datamodule import CoraDataModule, PubMedDataModule
 from src.GAT.lightning.gat_module import LitGAT
 

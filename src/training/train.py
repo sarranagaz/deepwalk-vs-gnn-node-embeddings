@@ -5,8 +5,7 @@ from pathlib import Path
 import lightning.pytorch as pl
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
-
-from src.GAT.lightning.datamodule import CoraDataModule, PubMedDataModule
+from src.GAT.lightning.datamodule import GraphDataModule
 from src.GAT.lightning.gat_module import LitGAT
 
 
@@ -15,13 +14,11 @@ def main(data: str = "Cora") -> None:
     output_dir = Path("outputs")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if data == "Cora":
-        datamodule = CoraDataModule(root="data", self_loops=True)
-    elif data == "PubMed":
-        datamodule = PubMedDataModule(root="data", self_loops=True)
+    if data in {"Cora", "Citeseer", "PubMed"}:
+        datamodule = GraphDataModule(name=data, root="data", self_loops=True)
     else:
-        raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora' and 'PubMed'.")
-    
+        raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'.")
+
     datamodule.setup()
 
     graph = datamodule.graph_data
