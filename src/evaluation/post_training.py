@@ -104,4 +104,4 @@ def make_post_training_figures(checkpoint_path: str, output_dir: str = "outputs/
 
 if __name__ == "__main__":
     checkpoint_path = "outputs/checkpoints/best-gat-epoch=21-val_acc=0.6980.ckpt"
-    make_post_training_figures(checkpoint_path, output_dir="outputs/figures/citeseer", data="Citeseer")
+    make_post_training_figures(checkpoint_path, output_dir="outputs/figures/gat/citeseer", data="Citeseer")
