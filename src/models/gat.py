@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.GAT.datasets.graph_data import load_data
+from src.datasets.graph_data import load_data
 from torch_geometric.utils import softmax
 
 

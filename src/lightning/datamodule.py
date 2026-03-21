@@ -1,7 +1,7 @@
 """Data module for handling graph data in PyTorch Lightning."""
 
 import lightning.pytorch as pl
-from src.GAT.datasets.graph_data import GraphData, load_data
+from src.datasets.graph_data import GraphData, load_data
 from torch.utils.data import DataLoader, Dataset
 
 

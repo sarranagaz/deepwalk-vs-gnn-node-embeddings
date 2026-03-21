@@ -5,8 +5,8 @@ from pathlib import Path
 import lightning.pytorch as pl
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
-from src.GAT.lightning.datamodule import GraphDataModule
-from src.GAT.lightning.gat_module import LitGAT
+from src.lightning.datamodule import GraphDataModule
+from src.lightning.gat_module import LitGAT
 
 
 def main(data: str = "Cora") -> None:
@@ -67,4 +67,4 @@ def main(data: str = "Cora") -> None:
 
 
 if __name__ == "__main__":
-    main(data="Cora")
+    main(data="Citeseer")

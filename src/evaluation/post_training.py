@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import torch
 from sklearn.manifold import TSNE
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
-from src.GAT.lightning.datamodule import CoraDataModule, PubMedDataModule
-from src.GAT.lightning.gat_module import LitGAT
+from src.lightning.datamodule import GraphDataModule
+from src.lightning.gat_module import LitGAT
 
 
-def load_best_model(checkpoint_path: str, datamodule: CoraDataModule | PubMedDataModule) -> LitGAT:
+def load_best_model(checkpoint_path: str, datamodule: GraphDataModule) -> LitGAT:
     """Loads the best model checkpoint for evaluation.
 
     Args:
@@ -47,10 +47,11 @@ def make_post_training_figures(checkpoint_path: str, output_dir: str = "outputs/
     outdir = Path(output_dir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    if data == "Cora":
-        datamodule = CoraDataModule(root="data", self_loops=True)
-    elif data == "PubMed":
-        datamodule = PubMedDataModule(root="data", self_loops=True)
+    if data in ["Cora", "Citeseer", "PubMed"]:
+        datamodule = GraphDataModule(name=data, root="data", self_loops=True)
+    else:
+        raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'.")
+        
     datamodule.setup()
     graph = datamodule.graph_data
 
@@ -102,5 +103,5 @@ def make_post_training_figures(checkpoint_path: str, output_dir: str = "outputs/
 
 
 if __name__ == "__main__":
-    checkpoint_path = "outputs/checkpoints/best-gat-epoch=45-val_acc=0.7900.ckpt"
-    make_post_training_figures(checkpoint_path, output_dir="outputs/figures/cora", data="Cora")
+    checkpoint_path = "outputs/checkpoints/best-gat-epoch=21-val_acc=0.6980.ckpt"
+    make_post_training_figures(checkpoint_path, output_dir="outputs/figures/citeseer", data="Citeseer")
