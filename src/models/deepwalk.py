@@ -24,6 +24,7 @@ class DeepWalk(nn.Module):
         workers: int = 1,
         seed: int = 42,
     ) -> None:
+        """Initialize DeepWalk model with given hyperparameters."""
         super().__init__()
 
         self.embedding_dim = embedding_dim
@@ -53,8 +54,9 @@ class DeepWalk(nn.Module):
         src_nodes = edge_index[0].tolist()
         dst_nodes = edge_index[1].tolist()
 
-        for src, dst in zip(src_nodes, dst_nodes):
+        for src, dst in zip(src_nodes, dst_nodes, strict=False):
             adjacency[src].append(dst)
+            adjacency[dst].append(src)  # Undirected graph
 
         return adjacency
 

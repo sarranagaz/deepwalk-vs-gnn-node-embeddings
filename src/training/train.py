@@ -5,9 +5,11 @@ from pathlib import Path
 import lightning.pytorch as pl
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from lightning.pytorch.loggers import CSVLogger
+
 from src.lightning.datamodule import GraphDataModule
-from src.lightning.gat_module import LitGAT
 from src.lightning.deepwalk_module import LitDeepWalk
+from src.lightning.gat_module import LitGAT
+
 
 def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
     """Train a model on the selected graph dataset."""
@@ -17,9 +19,7 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
     if data in {"Cora", "Citeseer", "PubMed"}:
         datamodule = GraphDataModule(name=data, root="data", self_loops=True)
     else:
-        raise ValueError(
-            f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'."
-        )
+        raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'.")
 
     datamodule.setup()
     graph = datamodule.graph_data
@@ -35,13 +35,13 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
             lr=0.005,
             weight_decay=5e-4,
         )
-        checkpoint_name = f"best-gat-{data}-"+"{epoch:02d}-{val_acc:.4f}"
+        checkpoint_name = f"best-gat-{data}-" + "{epoch:02d}-{val_acc:.4f}"
         logger_name = "lightning_logs_gat"
 
     elif model_name.lower() == "deepwalk":
         model = LitDeepWalk(
             num_nodes=graph.num_nodes,  # type: ignore
-            nclass=graph.num_classes,   # type: ignore
+            nclass=graph.num_classes,  # type: ignore
             num_features=graph.num_features,  # type: ignore
             embedding_dim=128,
             walk_length=40,
@@ -54,7 +54,7 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
             workers=1,
             seed=42,
         )
-        checkpoint_name = f"best-deepwalk-{data}-"+"{epoch:02d}-{val_acc:.4f}"
+        checkpoint_name = f"best-deepwalk-{data}-" + "{epoch:02d}-{val_acc:.4f}"
         logger_name = "lightning_logs_deepwalk"
 
     else:
@@ -93,4 +93,4 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
 
 
 if __name__ == "__main__":
-    main(data="Citeseer", model_name="deepwalk")
+    main(data="Cora", model_name="deepwalk")

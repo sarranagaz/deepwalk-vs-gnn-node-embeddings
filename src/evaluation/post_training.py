@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import torch
 from sklearn.manifold import TSNE
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
 from src.lightning.datamodule import GraphDataModule
-from src.lightning.gat_module import LitGAT
 from src.lightning.deepwalk_module import LitDeepWalk
+from src.lightning.gat_module import LitGAT
 
 
 def load_best_model(checkpoint_path: str, datamodule: GraphDataModule, model_name: str = "gat") -> LitGAT | LitDeepWalk:
@@ -77,7 +78,7 @@ def make_post_training_figures(
     model.trainer = DummyTrainer(datamodule)  # type: ignore
     if model_name == "deepwalk":
         model.setup()  # type: ignore
-    
+
     with torch.no_grad():
         if model_name == "gat":
             logits = model(graph.x, graph.edge_index)  # type: ignore
