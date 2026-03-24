@@ -3,8 +3,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.datasets.graph_data import load_data
 from torch_geometric.utils import softmax
+
+from src.datasets.graph_data import load_data
 
 
 class GATLayer(nn.Module):  # type: ignore
