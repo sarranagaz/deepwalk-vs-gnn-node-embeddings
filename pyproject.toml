@@ -3,8 +3,9 @@ name = "deepwalk-vs-gnn-node-embeddings"
 version = "0.1.0"
 description = "Node classification using DeepWalk and GNN"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
+    "gensim>=4.4.0",
     "lightning>=2.6.1",
     "matplotlib>=3.10.8",
     "mypy>=1.19.1",

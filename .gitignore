@@ -11,3 +11,5 @@ wheels/
 outputs/checkpoints/
 outputs/lightning_logs/
 data/
+*.csv
+*.yaml
