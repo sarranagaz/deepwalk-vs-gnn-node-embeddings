@@ -131,10 +131,10 @@ def make_post_training_figures(
 
 
 if __name__ == "__main__":
-    checkpoint_path = "outputs/checkpoints/best-deepwalk-Citeseer-epoch=07-val_acc=0.6020.ckpt"
+    checkpoint_path = "outputs/checkpoints/best-deepwalk-Cora-epoch=13-val_acc=0.7520.ckpt"
     make_post_training_figures(
         checkpoint_path,
-        output_dir="outputs/figures/deepwalk/citeseer",
-        data="Citeseer",
+        output_dir="outputs/figures/deepwalk/cora",
+        data="Cora",
         model_name="deepwalk",
     )
