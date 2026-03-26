@@ -36,8 +36,8 @@ def load_best_model(checkpoint_path: str, datamodule: GraphDataModule, model_nam
             nclass=graph.num_classes,  # type: ignore
             embedding_dim=128,
             walk_length=40,
-            num_walks=20,
-            window_size=10,
+            num_walks=10,
+            window_size=5,
             w2v_epochs=5,
             classifier_hidden_dim=64,
             lr=0.01,
@@ -73,8 +73,12 @@ def make_post_training_figures(
     outdir = Path(output_dir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    if data in ["Cora", "Citeseer", "PubMed"]:
-        datamodule = GraphDataModule(name=data, root="data", self_loops=True)
+    if data in {"Cora", "Citeseer", "PubMed"}:
+        # note: no self-loops for DeepWalk, as it is based on random walks and not message passing
+        if model_name.lower() == "deepwalk":
+            datamodule = GraphDataModule(name=data, root="data", self_loops=False)
+        else:
+            datamodule = GraphDataModule(name=data, root="data", self_loops=True)
     else:
         raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'.")
 
@@ -147,10 +151,10 @@ def make_post_training_figures(
 
 
 if __name__ == "__main__":
-    checkpoint_path = "outputs/checkpoints/best-gcn-PubMed-epoch=89-val_acc=0.7780.ckpt"
+    checkpoint_path = "outputs/checkpoints/best-deepwalk-PubMed-epoch=11-val_acc=0.7480.ckpt"
     make_post_training_figures(
         checkpoint_path,
-        output_dir="outputs/figures/gcn/pubmed",
+        output_dir="outputs/figures/deepwalk/pubmed",
         data="PubMed",
-        model_name="gcn",
+        model_name="deepwalk",
     )

@@ -13,7 +13,6 @@ class LitDeepWalk(pl.LightningModule):  # type: ignore
     def __init__(
         self,
         num_nodes: int,
-        num_features: int,
         nclass: int,
         embedding_dim: int = 128,
         walk_length: int = 40,
@@ -32,7 +31,6 @@ class LitDeepWalk(pl.LightningModule):  # type: ignore
 
         self.model = DeepWalk(
             embedding_dim=embedding_dim,
-            num_features=num_features,
             walk_length=walk_length,
             num_walks=num_walks,
             window_size=window_size,
@@ -64,13 +62,8 @@ class LitDeepWalk(pl.LightningModule):  # type: ignore
         if self.embeddings is None:
             raise RuntimeError("Embeddings are not initialized. setup() must run first.")
 
-        graph = self.trainer.datamodule.graph_data
-        dw = self.embeddings[node_indices].to(self.device)
-        feat = graph.x[node_indices].to(self.device)
-        # feat = graph.x.to(self.device)[node_indices]
-        x = torch.cat([dw, feat], dim=1)
-
-        return self.model(x)
+        dw = self.embeddings.to(self.device)[node_indices]
+        return self.model(dw)
 
     def _shared_step(self, stage: str) -> dict[str, torch.Tensor]:
         """Shared logic for train/val/test."""
