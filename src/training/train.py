@@ -18,7 +18,11 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if data in {"Cora", "Citeseer", "PubMed"}:
-        datamodule = GraphDataModule(name=data, root="data", self_loops=True)
+        # note: no self-loops for DeepWalk, as it is based on random walks and not message passing
+        if model_name.lower() == "deepwalk":
+            datamodule = GraphDataModule(name=data, root="data", self_loops=False)
+        else:
+            datamodule = GraphDataModule(name=data, root="data", self_loops=True)
     else:
         raise ValueError(f"Unsupported dataset: {data}. Supported datasets are 'Cora', 'Citeseer', and 'PubMed'.")
 
@@ -43,11 +47,10 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
         model = LitDeepWalk(
             num_nodes=graph.num_nodes,  # type: ignore
             nclass=graph.num_classes,  # type: ignore
-            num_features=graph.num_features,  # type: ignore
             embedding_dim=128,
             walk_length=40,
-            num_walks=20,
-            window_size=10,
+            num_walks=10,
+            window_size=5,
             w2v_epochs=5,
             classifier_hidden_dim=64,
             lr=0.01,
@@ -105,4 +108,4 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
 
 
 if __name__ == "__main__":
-    main(data="PubMed", model_name="gcn")
+    main(data="PubMed", model_name="deepwalk")

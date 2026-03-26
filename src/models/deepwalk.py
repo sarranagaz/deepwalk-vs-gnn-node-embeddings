@@ -13,7 +13,6 @@ class DeepWalk(nn.Module):
 
     def __init__(
         self,
-        num_features: int,
         embedding_dim: int = 128,
         walk_length: int = 40,
         num_walks: int = 10,
@@ -36,12 +35,11 @@ class DeepWalk(nn.Module):
         self.nclass = nclass
         self.workers = workers
         self.seed = seed
-        self.num_features = num_features
 
         self.classifier = nn.Sequential(
-            nn.Linear(embedding_dim + num_features, classifier_hidden_dim),
+            nn.Linear(embedding_dim , classifier_hidden_dim),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(0.2),
             nn.Linear(classifier_hidden_dim, nclass),
         )
 
@@ -98,8 +96,9 @@ class DeepWalk(nn.Module):
             vector_size=self.embedding_dim,
             window=self.window_size,
             min_count=0,
-            sg=1,
-            hs=1,
+            sg=1, # Skip-gram model
+            hs=0, # Negative sampling
+            negative=5, # Number of negative samples
             workers=self.workers,
             epochs=self.w2v_epochs,
             seed=self.seed,

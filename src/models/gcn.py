@@ -32,11 +32,12 @@ class GCNLayer(nn.Module):
         device = x.device
 
         adj = torch.zeros((num_nodes, num_nodes), device=device, dtype=x.dtype)
-        adj[edge_index[0], edge_index[1]] = 1.0
+        adj[edge_index[0], edge_index[1]] = 1.0 
 
-        # add self-loops
-        adj = adj + torch.eye(num_nodes, device=device, dtype=x.dtype)
-
+        # add self-loops if not already present
+        self_loops=torch.arange(num_nodes, device=device)
+        adj[self_loops, self_loops] = 1.0  # Ensure self-loops are included 
+        
         deg = adj.sum(dim=1)
         deg_inv_sqrt = deg.pow(-0.5)  # Compute D^(-1/2)
         deg_inv_sqrt[torch.isinf(deg_inv_sqrt)] = 0.0
