@@ -10,9 +10,10 @@ from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from src.lightning.datamodule import GraphDataModule
 from src.lightning.deepwalk_module import LitDeepWalk
 from src.lightning.gat_module import LitGAT
+from src.lightning.gcn_module import LitGCN
 
 
-def load_best_model(checkpoint_path: str, datamodule: GraphDataModule, model_name: str = "gat") -> LitGAT | LitDeepWalk:
+def load_best_model(checkpoint_path: str, datamodule: GraphDataModule, model_name: str = "gat") -> LitGAT | LitDeepWalk | LitGCN:
     """Loads the best model checkpoint for evaluation."""
     graph = datamodule.graph_data
 
@@ -44,8 +45,19 @@ def load_best_model(checkpoint_path: str, datamodule: GraphDataModule, model_nam
             workers=1,
             seed=42,
         )
+
+    elif model_name == "gcn":
+        model = LitGCN.load_from_checkpoint(
+            checkpoint_path,
+            nfeat=graph.num_features,  # type: ignore
+            nhid=16,
+            nclass=graph.num_classes,  # type: ignore
+            dropout=0.5,
+            lr=0.01,
+            weight_decay=5e-4,
+        )
     else:
-        raise ValueError("model_name must be either 'gat' or 'deepwalk'.")
+        raise ValueError("model_name must be either 'gat', 'deepwalk', or 'gcn'.")
 
     model.eval()
     return model  # type: ignore
@@ -79,12 +91,16 @@ def make_post_training_figures(
     if model_name == "deepwalk":
         model.setup()  # type: ignore
 
+    device = next(model.parameters()).device
+
     with torch.no_grad():
         if model_name == "gat":
-            logits = model(graph.x, graph.edge_index)  # type: ignore
+            logits = model(graph.x.to(device), graph.edge_index.to(device))  # type: ignore
         elif model_name == "deepwalk":
-            node_indices = torch.arange(graph.num_nodes)
+            node_indices = torch.arange(graph.num_nodes, device=device)  # type: ignore
             logits = model(node_indices)  # type: ignore
+        elif model_name == "gcn":
+            logits = model(graph.x.to(device), graph.edge_index.to(device))  # type: ignore
 
         preds = logits.argmax(dim=1).cpu().numpy()
 
@@ -131,10 +147,10 @@ def make_post_training_figures(
 
 
 if __name__ == "__main__":
-    checkpoint_path = "outputs/checkpoints/best-deepwalk-Cora-epoch=13-val_acc=0.7520.ckpt"
+    checkpoint_path = "outputs/checkpoints/best-gcn-PubMed-epoch=89-val_acc=0.7780.ckpt"
     make_post_training_figures(
         checkpoint_path,
-        output_dir="outputs/figures/deepwalk/cora",
-        data="Cora",
-        model_name="deepwalk",
+        output_dir="outputs/figures/gcn/pubmed",
+        data="PubMed",
+        model_name="gcn",
     )

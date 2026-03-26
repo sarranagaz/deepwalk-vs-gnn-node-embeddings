@@ -9,6 +9,7 @@ from lightning.pytorch.loggers import CSVLogger
 from src.lightning.datamodule import GraphDataModule
 from src.lightning.deepwalk_module import LitDeepWalk
 from src.lightning.gat_module import LitGAT
+from src.lightning.gcn_module import LitGCN
 
 
 def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
@@ -56,9 +57,20 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
         )
         checkpoint_name = f"best-deepwalk-{data}-" + "{epoch:02d}-{val_acc:.4f}"
         logger_name = "lightning_logs_deepwalk"
+    elif model_name.lower() == "gcn":
+        model = LitGCN(
+            nfeat=graph.num_features,  # type: ignore
+            nhid=16,
+            nclass=graph.num_classes,  # type: ignore
+            dropout=0.5,
+            lr=0.01,
+            weight_decay=5e-4,
+        )
+        checkpoint_name = f"best-gcn-{data}-" + "{epoch:02d}-{val_acc:.4f}"
+        logger_name = "lightning_logs_gcn"
 
     else:
-        raise ValueError("model_name must be either 'gat' or 'deepwalk'.")
+        raise ValueError("model_name must be either 'gat', 'deepwalk', or 'gcn'.")
 
     checkpoint_callback = ModelCheckpoint(
         dirpath=output_dir / "checkpoints",
@@ -93,4 +105,4 @@ def main(data: str = "Cora", model_name: str = "deepwalk") -> None:
 
 
 if __name__ == "__main__":
-    main(data="Cora", model_name="deepwalk")
+    main(data="PubMed", model_name="gcn")
